@@ -124,6 +124,13 @@ class Render:
         ctx.line_to(x2, y2)
         ctx.stroke()
 
+    def path(self, xy):
+        ctx = self.ctx
+        ctx.move_to(*xy[0, :])
+        for p in xy:
+            ctx.line_to(*p)
+        ctx.stroke()
+
     def circle(self, x, y, r, fill=False):
         ctx = self.ctx
         ctx.arc(x, y, r, 0, pi * 2)

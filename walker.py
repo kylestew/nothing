@@ -1,8 +1,9 @@
 #%%
 
 from numpy import linspace
-from numpy import ones, zeros
+from numpy import zeros
 from numpy import column_stack
+from numpy.random import random
 
 
 class BadWalkers:
@@ -21,44 +22,63 @@ class BadWalkers:
 
     def run(self):
         while True:
-
-            # self._walkers[:, 1] = 0.5 + ()
+            random(self.n)
+            rand = (1.0 - 2.0 * random(self.n)) * self.scale
+            self._walkers[:, 1] += rand
             yield self._walkers
-
 
 #%%
 from numpy import array
 
 SIZE = 1000
 ONE = 1.0 / SIZE
+DOT = ONE * 4
 EDGE = 0.05
 
-SCALE = array((0, 1), "float") * 0.4
-NUM = 100
+SCALE = 0.003
+NUM = 128
 
-w = BadWalkers(SIZE, EDGE, SCALE, NUM)
-next(w.run())
+# ITER = 1900
+ITER = 19
 
-#%%
+w = BadWalkers(SIZE, EDGE, SCALE, NUM).run()
+
 from modules.render import Render
 %load_ext ipython_cairo
 
-BACK = [1, 1, 1, 1]
-FRONT = [1, 0, 0, 1]
+BACK = [235/255, 172/255, 162/255, 1] # ebaca2
+PRIMARY = [74/255, 145/255, 158/255, 0.01] # 4a919e
+SECONDARY = [33/255, 46/255, 83/255, 0.01] # 212e53
 
-size = 600
+size = 1200
 
-render = Render(size, BACK, FRONT)
+render = Render(size, BACK, PRIMARY)
 render.remap(domain=(0, 1), range=(0.5, -0.5))
 # render.remap(domain=(-1, 1), range=(1, -1))
 render.set_line_width(ONE)
 
-for pt in next(w.run()):
-    x, y = pt
-    render.circle(x, y, .002, fill=True)
+render.ctx.translate(0.5, 0)
+render.ctx.rotate(-0.25)
+render.ctx.translate(-0.5, 0)
 
-# render.circle(0, 0, 0.05, fill=True)
-# render.circle(0.5, 0.5, 0.05, fill=True)
-# render.circle(1, -0.5, 0.05, fill=True)
+for _ in range(ITER):
+    dots = next(w)
+
+    # render.path(dots)
+
+    for pt in dots:
+        x, y = pt
+        render.circle(x, y, DOT, fill=True)
+        
+render.ctx.translate(0.5, 0)
+render.ctx.rotate(0.5)
+render.ctx.translate(-0.5, 0)
+render.set_front(SECONDARY)
+
+for _ in range(ITER):
+    dots = next(w)
+    for pt in dots:
+        x, y = pt
+        render.circle(x, y, DOT, fill=True)
 
 render.ctx
