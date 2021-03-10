@@ -114,6 +114,9 @@ class Render:
     def set_back(self, c):
         self.back = c
 
+    def set_operator(self, op):
+        self.ctx.set_operator(op)
+
     def set_line_width(self, w):
         self.line_width = w
         self.ctx.set_line_width(w)
@@ -177,6 +180,7 @@ class Render:
         ctx.fill()
 
     def sandstroke(self, xys, grains=10):
+        # TODO: does this work?
         pix = self.pix
         rectangle = self.ctx.rectangle
         fill = self.ctx.fill
