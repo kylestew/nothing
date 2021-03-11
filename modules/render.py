@@ -127,11 +127,13 @@ class Render:
         ctx.line_to(x2, y2)
         ctx.stroke()
 
-    def path(self, xy):
+    def path(self, xy, closed=False):
         ctx = self.ctx
         ctx.move_to(*xy[0, :])
         for p in xy:
             ctx.line_to(*p)
+        if closed:
+            ctx.close_path()
         ctx.stroke()
 
     def circle(self, x, y, r, fill=False):
