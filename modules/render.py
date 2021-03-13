@@ -127,18 +127,29 @@ class Render:
         ctx.line_to(x2, y2)
         ctx.stroke()
 
-    def path(self, xy, closed=False):
+    def path(self, xy, closed=False, fill=False):
         ctx = self.ctx
         ctx.move_to(*xy[0, :])
         for p in xy:
             ctx.line_to(*p)
         if closed:
             ctx.close_path()
-        ctx.stroke()
+        if fill:
+            ctx.fill()
+        else:
+            ctx.stroke()
 
     def circle(self, x, y, r, fill=False):
         ctx = self.ctx
         ctx.arc(x, y, r, 0, pi * 2)
+        if fill:
+            ctx.fill()
+        else:
+            ctx.stroke()
+
+    def rect(self, x, y, w, h, fill=False):
+        ctx = self.ctx
+        ctx.rectangle(x, y, w, h)
         if fill:
             ctx.fill()
         else:
@@ -191,9 +202,3 @@ class Render:
         dy = xys[:, 3] - xys[:, 1]
 
         return dx
-
-
-class Animate(Render):
-    def __init__(self, n, front, back, step):
-
-        Render.__init__(self, n, front, back)

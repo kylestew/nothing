@@ -8,6 +8,9 @@ class Rect:
     def area(self):
         return self.w * self.h
 
+    def center(self):
+        return self.x + self.w / 2.0, self.y + self.h / 2.0
+
     def bounds(self):
         self
 
@@ -15,8 +18,3 @@ class Rect:
         p = (self.x, self.y)
         q = (p[0] + self.w, p[1] + self.h)
         return [p, (q[0], p[1]), q, (p[0], q[1])]
-
-
-# rect = Rect(1, 2, 10, 20)
-# pts = rect.to_points()
-# pts
