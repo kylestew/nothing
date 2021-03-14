@@ -1,5 +1,3 @@
-#%%
-
 from numpy import column_stack
 from numpy import linspace
 from numpy import sin, cos
@@ -18,12 +16,5 @@ class Polygon(PCLike):
         pts = (x, y) + column_stack((cos(a), sin(a))) * r
         return cls(pts)
 
-    # def area(self):
-    # pass
-
-
-# def bounds(self):
-# return Rect(self.x, self.y, 2 * self.r, 2 * self.r)
-
-p = Polygon(5)
-p.points
+    def vertices(self):
+        return self.points

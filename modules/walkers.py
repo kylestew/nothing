@@ -3,10 +3,7 @@ from numpy import linspace
 from numpy import zeros
 from numpy import column_stack
 from numpy.random import random
-
 from .perlin import generate_perlin_noise_2d
-
-# from perlin import generate_perlin_noise_2d
 
 
 class Walkers:

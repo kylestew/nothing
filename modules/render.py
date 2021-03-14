@@ -121,10 +121,10 @@ class Render:
         self.line_width = w
         self.ctx.set_line_width(w)
 
-    def line(self, x1, y1, x2, y2):
+    def line(self, a, b):
         ctx = self.ctx
-        ctx.move_to(x1, y1)
-        ctx.line_to(x2, y2)
+        ctx.move_to(a[0], a[1])
+        ctx.line_to(b[0], b[1])
         ctx.stroke()
 
     def path(self, xy, closed=False, fill=False):
@@ -139,8 +139,17 @@ class Render:
         else:
             ctx.stroke()
 
-    def circle(self, x, y, r, fill=False):
+    def circle(self, xy, r, fill=False):
+        """
+        xy : (float, float)
+            point (x, y)
+        r : float
+            radius of circle
+        fill : bool, optional
+            stroke or fill circle (default stroke)
+        """
         ctx = self.ctx
+        x, y = xy
         ctx.arc(x, y, r, 0, pi * 2)
         if fill:
             ctx.fill()
@@ -186,9 +195,10 @@ class Render:
             rectangle(x, y, pix, pix)
             fill()
 
-    def dot(self, x, y):
+    def dot(self, xy):
         ctx = self.ctx
         pix = self.pix
+        x, y = xy
         ctx.rectangle(x, y, pix, pix)
         ctx.fill()
 

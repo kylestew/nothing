@@ -1,14 +1,16 @@
+from geom.api.shape import PCLike
 from .resample.resample import resample
-from .polygon import Polygon
 
 
-class Rect:
-    def __init__(self, x, y, w, h):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
+class Line(PCLike):
+    def __init__(self, a, b):
+        super().__init__([a, b])
 
+    def vertices(self):
+        return self.points
+
+
+"""
     def area(self):
         return self.w * self.h
 
@@ -31,7 +33,4 @@ class Rect:
     def transform(self):
         pass
 
-    def vertices(self):
-        p = (self.x, self.y)
-        q = (p[0] + self.w, p[1] + self.h)
-        return [p, (q[0], p[1]), q, (p[0], q[1])]
+"""
