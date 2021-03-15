@@ -62,7 +62,8 @@ class Render:
         self.front = front
         self.back = back
         # size of one pixel
-        self.pix = 1.0 / float(n)
+        self.pix = 1.0
+        #  / float(n)
 
         self.__init_cairo()
 
@@ -90,11 +91,14 @@ class Render:
         xscale = (d1 - d0) / (td1 - td0)
         yscale = (r1 - r0) / (tr1 - tr0)
 
+        print("scale", xscale, yscale)
+
         ctx.scale(xscale, yscale)
         ctx.translate(-td0, -tr0)  # TODO: only works once
 
         self.domain = domain
         self.range = range
+        self.pix /= xscale
 
     def clear_canvas(self):
         ctx = self.ctx

@@ -16,5 +16,8 @@ class Polygon(PCLike):
         pts = (x, y) + column_stack((cos(a), sin(a))) * r
         return cls(pts)
 
+    def center(self):
+        pass
+
     def vertices(self):
         return self.points
