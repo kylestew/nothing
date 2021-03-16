@@ -31,8 +31,10 @@ def resample(pts, dist=None, num=None, closed=True):
 class Sampler:
     def __init__(self, pts, closed=False):
         if closed:
+            from numpy import append
+
             self._pts = pts
-            self._pts.append(pts[0])
+            self._pts = append(self._pts, pts[0])
         else:
             self._pts = pts
         self.build_index(pts)

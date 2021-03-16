@@ -1,5 +1,7 @@
-from .resample.resample import resample
 from .polygon import Polygon
+from .internal.resample import resample
+from .internal.transform import translate_points, rotate_points, scale_points
+from numpy import array
 
 
 class Rect:
@@ -25,13 +27,18 @@ class Rect:
         pass
 
     def resample(self, dist=None, num=None):
-        poly = self.as_polygon()
-        return Polygon(resample(poly.points, dist, num))
+        return Polygon(resample(self.vertices(), dist, num))
 
-    def transform(self):
-        pass
+    def translate(self, tx, ty):
+        return Polygon(translate_points(self.vertices(), tx, ty))
+
+    def rotate(self, rad):
+        return Polygon(rotate_points(self.vertices(), rad))
+
+    def scale(self, sx, sy):
+        return Polygon(scale_points(self.vertices(), sx, sy))
 
     def vertices(self):
         p = (self.x, self.y)
         q = (p[0] + self.w, p[1] + self.h)
-        return [p, (q[0], p[1]), q, (p[0], q[1])]
+        return array([p, (q[0], p[1]), q, (p[0], q[1])])

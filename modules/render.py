@@ -91,8 +91,6 @@ class Render:
         xscale = (d1 - d0) / (td1 - td0)
         yscale = (r1 - r0) / (tr1 - tr0)
 
-        print("scale", xscale, yscale)
-
         ctx.scale(xscale, yscale)
         ctx.translate(-td0, -tr0)  # TODO: only works once
 

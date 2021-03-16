@@ -3,6 +3,7 @@ from numpy import linspace
 from numpy import sin, cos
 from numpy import pi
 from geom.api.shape import PCLike
+from .internal.resample import resample
 
 
 class Polygon(PCLike):
@@ -18,6 +19,9 @@ class Polygon(PCLike):
 
     def center(self):
         pass
+
+    def resample(self, dist=None, num=None):
+        return Polygon(resample(self.points, dist, num))
 
     def vertices(self):
         return self.points
