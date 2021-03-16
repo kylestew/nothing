@@ -33,8 +33,7 @@ class Sampler:
         if closed:
             from numpy import append
 
-            self._pts = pts
-            self._pts = append(self._pts, pts[0])
+            self._pts = append(pts, [pts[0]], axis=0)
         else:
             self._pts = pts
         self.build_index(pts)

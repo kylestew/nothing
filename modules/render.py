@@ -120,8 +120,8 @@ class Render:
         self.ctx.set_operator(op)
 
     def set_line_width(self, w):
-        self.line_width = w
-        self.ctx.set_line_width(w)
+        self.line_width = w * self.pix
+        self.ctx.set_line_width(self.line_width)
 
     def line(self, a, b):
         ctx = self.ctx
