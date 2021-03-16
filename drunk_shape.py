@@ -1,8 +1,9 @@
 #%%
 # perlin noise -> vector flow field
 from perlin import generate_perlin_noise_2d
+from numpy import array
 import numpy as np
-np.random.seed(22)
+np.random.seed(5)
 noise_density = 1024
 noise = generate_perlin_noise_2d((noise_density, noise_density), (8, 8))
 theta = noise * 2 * np.pi
@@ -17,7 +18,7 @@ mult = 0.001
 
 from geom.rect import Rect
 rect = Rect(0.3, 0.3, 0.4, 0.4)
-poly = rect.resample(dist=0.005)
+poly = rect.resample(dist=0.0005)
 paths = [ poly.points ]
 for i in range(iterations):
     xy = (poly.points * noise_density).astype(int)
@@ -44,14 +45,14 @@ from numpy import array, pi, cos, sin, column_stack
 
 CANVAS_SQUARE_SIZE = noise_density * 2
 BACKGROUND = hex_to_rgba("#332633")
-FOREGROUND = hex_to_rgba("#ee99aa09")
-DEBUG = hex_to_rgba("#00FFFF33")
+FOREGROUND = hex_to_rgba("#ee99aa12")
+DEBUG = hex_to_rgba("#00FFFF24")
 
 render = Render(CANVAS_SQUARE_SIZE, BACKGROUND, FOREGROUND)
 # render.remap(domain=(-0.05, 1.05), range=(-0.05, 1.05))
-render.set_line_width(4.0)
 
-render.set_front(hex_to_rgba("FFFFFFFF"))
+render.set_line_width(9.0)
+render.set_front(hex_to_rgba("FFFFFFee"))
 render.path(rect.vertices(), closed=True)
 
 render.set_line_width(2.0)
