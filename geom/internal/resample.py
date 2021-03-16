@@ -1,5 +1,6 @@
 from math import dist
 from numpy import array
+from numpy import append
 
 
 def interpolate_pt(a, b, t):
@@ -31,12 +32,10 @@ def resample(pts, dist=None, num=None, closed=True):
 class Sampler:
     def __init__(self, pts, closed=False):
         if closed:
-            from numpy import append
-
             self._pts = append(pts, [pts[0]], axis=0)
         else:
             self._pts = pts
-        self.build_index(pts)
+        self.build_index(self._pts)
 
     def build_index(self, pts):
         """
