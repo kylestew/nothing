@@ -54,28 +54,28 @@ from numpy.random import random
 
 class Render:
     """
-    Creates a standardized drawing canvas with domain and range of [0,1]
+    Creates a standardized drawing canvas with given width, height
     """
 
-    def __init__(self, n, back, front):
-        self.n = n
+    def __init__(self, w, h, back, front):
+        self.w = w
+        self.h = h
         self.front = front
         self.back = back
         # size of one pixel
         self.pix = 1.0
-        #  / float(n)
 
         self.__init_cairo()
 
     def __init_cairo(self):
-        sur = cairo.ImageSurface(cairo.FORMAT_ARGB32, self.n, self.n)
+        sur = cairo.ImageSurface(cairo.FORMAT_ARGB32, self.w, self.h)
         ctx = cairo.Context(sur)
 
         self.sur = sur
         self.ctx = ctx
 
-        self.domain = [0, self.n]
-        self.range = [0, self.n]
+        self.domain = [0, self.w]
+        self.range = [0, self.h]
 
         self.remap([0, 1], [0, 1])
         self.clear_canvas()
