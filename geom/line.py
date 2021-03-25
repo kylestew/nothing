@@ -1,10 +1,15 @@
 from geom.api.shape import PCLike
-from .resample.resample import resample
+from .internal.resample import resample
+from numpy import array
 
 
 class Line(PCLike):
     def __init__(self, a, b):
         super().__init__([a, b])
+
+    def resample(self, dist=None, num=None):
+        # TODO: does this become a polyline?
+        return array(resample(self.vertices(), dist, num, closed=False))
 
     def vertices(self):
         return self.points
