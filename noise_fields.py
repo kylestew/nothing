@@ -5,7 +5,8 @@ from lib.sketch import Sketch
 from numpy import array, meshgrid
 from scipy import interpolate
 from numpy import linspace
-from numpy import sin, cos
+from numpy import sin, cos, pi
+from numpy import random
 
 class NoiseField(Sketch):
     """
@@ -26,20 +27,24 @@ class NoiseField(Sketch):
         # amp = lerp(0.01, 1.0, self.param_c)
         # weight = lerp(0.5, 20.0, self.param_d)
 
+        from perlin import generate_perlin_noise_2d
+        random.seed(5)
+        density = 64
+        noise = generate_perlin_noise_2d((density, density), (8, 8))
+        field = noise * pi
+
         domain = [-1.2, 1.2]
-        density = 12
         xs = linspace(domain[0], domain[1], density)
         ys = linspace(domain[0], domain[1], density)
-        xx, yy = meshgrid(xs, ys)
         # def f(x, y):
             # return x * 2*y
-        z = 2 * xx * 3 * yy
-        f = interpolate.interp2d(xs, ys, z, kind='cubic')
+        # z = 2 * xx * 3 * yy
+        f = interpolate.interp2d(xs, ys, field, kind='cubic')
         
         # display field
-        self.set_line_width(0.5)
+        self.set_line_width(1.0)
         self.set_color(self.color_a)
-        display_density = 60
+        display_density = density * 4
         for y in linspace(-1, 1, display_density):
             for x in linspace(-1, 1, display_density):
                 theta = f(x, y)[0]
@@ -57,10 +62,10 @@ class NoiseField(Sketch):
                 # print(theta)
                 a = array((x, y))
                 b = a + (sin(theta) * 0.05, cos(theta) * 0.05)
-                self.circle(a, 0.01)
-                self.line(a, b)
+                # self.circle(a, 0.01)
+                # self.line(a, b)
 
-width, height = 800, 800
+width, height = 1200, 1200
 sketch = NoiseField(width, height)
 
 # step = 10
@@ -80,7 +85,7 @@ sketch = NoiseField(width, height)
 
 # ARGB
 sketch.set_colors(
-    [0xFF, 0xFF, 0xFF, 0xFF],
+    [0xAA, 0xFF, 0xCC, 0xCC],
     [0xFF, 0xFF, 0x00, 0xFF],
     [0xFF, 0xFF, 0x00, 0x00],
     [0xFF, 0xFF, 0x00, 0x00],
