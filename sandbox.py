@@ -14,7 +14,7 @@ class Sandbox(Sketch):
         clear_color = [0, 0, 0, 1]
         range = [0, 1]
         super().__init__(w, h, clear_color, range)
-        
+
     def draw(self):
         # constants
 
@@ -22,13 +22,13 @@ class Sandbox(Sketch):
         # step = self.step
         count = lerp(1, 128, self.param_a)
         smoothness = lerp(4, 64, 1.0 - self.param_b)
-        amp = lerp(0.05, 2.0, self.param_c)
+        amp = lerp(0.01, 1.0, self.param_c)
         weight = lerp(0.5, 20.0, self.param_d)
 
         # apply params
         self.set_color(self.color_a)
         self.set_line_width(weight)
-        
+
         # generate noise lines
         xs = linspace(self.min_x, self.max_x, int(smoothness), endpoint=True)
         polylines = []
@@ -36,12 +36,13 @@ class Sandbox(Sketch):
             # sample xys at low resolution
             f = lambda x: y + amp * (self.luminosity_at((x, y)) - 0.5)
             ys = list(map(f, xs))
-            
+
             # generate function interpolating values
             from scipy.interpolate import interp1d
-            fi = interp1d(xs, ys, kind='cubic')
+
+            fi = interp1d(xs, ys, kind="cubic")
             # fi = interp1d(xs, ys)
-            
+
             # graph using interpolated function (instead of direct reading)
             x = linspace(self.min_x, self.max_x, int(self.w / 2))
             y = fi(x)
@@ -52,9 +53,10 @@ class Sandbox(Sketch):
         for polyline in polylines:
             self.path(polyline)
             # for pt in polyline:
-                # self.circle(pt, 0.001)
+            # self.circle(pt, 0.001)
 
 
+"""
 # load sample image (once, static)
 from helpers.img_samp import Sampler
 width, height, depth, view = Sampler("helpers/grad.png").load_image()
@@ -89,3 +91,4 @@ d = sketch.render()
 
 %load_ext helpers.ipython_cairo
 sketch.ctx
+"""
