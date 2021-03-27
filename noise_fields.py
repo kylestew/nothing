@@ -1,12 +1,11 @@
 #%%
-from numpy.random import sample
 from lib.sketch import Sketch
-# from numpy import linspace, column_stack
-from numpy import array, meshgrid
-from scipy import interpolate
+from lib.interp import remap, lerp
+from lib.field import Perlin3DField
+from numpy import array
 from numpy import linspace
-from numpy import sin, cos, pi
-from numpy import random
+from numpy import sin, cos
+
 
 class NoiseField(Sketch):
     """
@@ -18,79 +17,88 @@ class NoiseField(Sketch):
         clear_color = [0, 0, 0, 1]
         range = [-1, 1]
         super().__init__(w, h, clear_color, range)
+        self.setup_field()
+
+    def setup_field(self):
+        # setup perlin field sampling function
+        # TODO:
+        # - types of noise
+        # - noise settings
+        shape = (12, 12, 12)
+        res = (2, 2, 2)
+        self.field = Perlin3DField(shape, res)
+        self.dims = [(-1.2, 1.2), (-1.2, 1.2), (-1.2, 1.2)]
+        self.fn = self.field.fn(self.dims)
 
     def draw(self):
-        # normalize params
-        # step = self.step
-        # count = lerp(1, 128, self.param_a)
-        # smoothness = lerp(4, 64, 1.0 - self.param_b)
-        # amp = lerp(0.01, 1.0, self.param_c)
-        # weight = lerp(0.5, 20.0, self.param_d)
+        z = remap(0, 1, -1, 1, self.step)
+        print("step - z", z)
 
-        from perlin import generate_perlin_noise_2d
-        random.seed(5)
-        density = 64
-        noise = generate_perlin_noise_2d((density, density), (8, 8))
-        field = noise * pi
+        def marker(x, y, theta):
+            a = array((x, y))
+            b = a + (sin(theta) * 0.04, cos(theta) * 0.04)
+            self.circle(a, 0.01)
+            self.line(a, b)
 
-        domain = [-1.2, 1.2]
-        xs = linspace(domain[0], domain[1], density)
-        ys = linspace(domain[0], domain[1], density)
-        # def f(x, y):
-            # return x * 2*y
-        # z = 2 * xx * 3 * yy
-        f = interpolate.interp2d(xs, ys, field, kind='cubic')
-        
-        # display field
-        self.set_line_width(1.0)
-        self.set_color(self.color_a)
-        display_density = density * 4
-        for y in linspace(-1, 1, display_density):
-            for x in linspace(-1, 1, display_density):
-                theta = f(x, y)[0]
-                a = array((x, y))
-                b = a + (sin(theta) * 0.03, cos(theta) * 0.03)
-                self.line(a, b)
-
-        # DEBUG: underlying field
+        # DEBUG: underlying field points (not interpolated)
         self.set_line_width(1)
         self.set_color(self.color_b)
-        for y in ys:
-            for x in xs:
-                # print(xs, ys)
-                theta = f(x, y)[0]
-                # print(theta)
-                a = array((x, y))
-                b = a + (sin(theta) * 0.05, cos(theta) * 0.05)
-                # self.circle(a, 0.01)
-                # self.line(a, b)
+        d0, d1, _ = self.dims
+        r0, r1, r2 = self.field.shape
+        k = round(self.step * r2)
+        j = 0
+        for y in linspace(d1[0], d1[1], r1):
+            i = 0
+            for x in linspace(d0[0], d0[1], r0):
+                theta = self.field.field[i, j, k]
+                marker(x, y, theta)
+                i += 1
+            j += 1
 
-width, height = 1200, 1200
+        # DEBUG: display flow field (interpolated points)
+        self.set_line_width(1.0)
+        self.set_color(self.color_a)
+        display_density = r0
+        for y in linspace(d1[0], d1[1], r1):
+            for x in linspace(d0[0], d0[1], r0):
+                theta = self.fn(x, y, z)
+                marker(x, y, theta)
+
+
+"""
+width, height = 900, 900
 sketch = NoiseField(width, height)
 
-# step = 10
-# sketch.set_step(step)
+step = 0.11
+sketch.set_step(step)
 
-# count = 0.5
-# smoothness = 0.65
-# amp = 0.33
-# weight = 0.250
 # sketch.set_params(count, smoothness, amp, weight)
-
-# func_a = True
-# func_b = False
-# func_c = False
-# func_d = False
-# sketch.set_options(func_a, func_b, func_c, func_d)
-
 # ARGB
 sketch.set_colors(
     [0xAA, 0xFF, 0xCC, 0xCC],
     [0xFF, 0xFF, 0x00, 0xFF],
     [0xFF, 0xFF, 0x00, 0x00],
     [0xFF, 0xFF, 0x00, 0x00],
-    )
+)
+
+# drop point on field and let it wander
+# steps = 0
+# speed = 0.025
+# path = empty([steps, 2])
+# path[0] = [0, 0]
+# for i in range(1, steps):
+# last position
+# x, y = path[i - 1]
+# theta = sketch.f(x, y)
+# new position
+# nx = x + sin(theta) * speed
+# ny = y + cos(theta) * speed
+# path[i] = [nx, ny]
+
+sketch.render()
+# sketch.set_color([0, 1, 1, 1])
+# sketch.path(path)
 
 %load_ext helpers.ipython_cairo
-d = sketch.render()
 sketch.ctx
+"""
