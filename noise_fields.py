@@ -25,19 +25,20 @@ class NoiseField(Sketch):
         # - types of noise
         # - noise settings
         shape = (12, 12, 12)
-        res = (2, 2, 2)
+        res = (3, 3, 3)
         self.field = Perlin3DField(shape, res)
         self.dims = [(-1.2, 1.2), (-1.2, 1.2), (-1.2, 1.2)]
         self.fn = self.field.fn(self.dims)
 
     def draw(self):
         z = remap(0, 1, -1, 1, self.step)
-        print("step - z", z)
+        # print("step - z", z)
 
-        def marker(x, y, theta):
+        def marker(x, y, theta, base=False):
             a = array((x, y))
             b = a + (sin(theta) * 0.04, cos(theta) * 0.04)
-            self.circle(a, 0.01)
+            if base:
+                self.circle(a, 0.01)
             self.line(a, b)
 
         # DEBUG: underlying field points (not interpolated)
@@ -45,37 +46,39 @@ class NoiseField(Sketch):
         self.set_color(self.color_b)
         d0, d1, _ = self.dims
         r0, r1, r2 = self.field.shape
-        k = round(self.step * r2)
+        k = round(self.step * (r2 - 1))
+        # print("k", k)
         j = 0
         for y in linspace(d1[0], d1[1], r1):
             i = 0
             for x in linspace(d0[0], d0[1], r0):
                 theta = self.field.field[i, j, k]
-                marker(x, y, theta)
+                marker(x, y, theta, base=True)
                 i += 1
             j += 1
 
         # DEBUG: display flow field (interpolated points)
         self.set_line_width(1.0)
         self.set_color(self.color_a)
-        display_density = r0
-        for y in linspace(d1[0], d1[1], r1):
-            for x in linspace(d0[0], d0[1], r0):
+        display_density = r0 * 4
+        for y in linspace(self.min_y, self.max_y, display_density):
+            for x in linspace(self.min_x, self.max_x, display_density):
                 theta = self.fn(x, y, z)
                 marker(x, y, theta)
 
 
 """
+
 width, height = 900, 900
 sketch = NoiseField(width, height)
 
-step = 0.11
+step = 0
 sketch.set_step(step)
 
 # sketch.set_params(count, smoothness, amp, weight)
 # ARGB
 sketch.set_colors(
-    [0xAA, 0xFF, 0xCC, 0xCC],
+    [0xFF, 0xFF, 0xFF, 0xFF],
     [0xFF, 0xFF, 0x00, 0xFF],
     [0xFF, 0xFF, 0x00, 0x00],
     [0xFF, 0xFF, 0x00, 0x00],
