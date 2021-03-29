@@ -1,4 +1,3 @@
-#%%
 from scipy import interpolate
 from numpy import linspace
 from numpy import pi
@@ -35,7 +34,9 @@ class Field:
             xs = linspace(d0[0], d0[1], r0)
             ys = linspace(d1[0], d1[1], r1)
             zs = linspace(d2[0], d2[1], r2)
-            f = RegularGridInterpolator((xs, ys, zs), self.field)
+            f = RegularGridInterpolator(
+                (xs, ys, zs), self.field, bounds_error=False, fill_value=0
+            )
 
             def ret_fn(x, y, z):
                 return f((x, y, z)).reshape(1)[0]
@@ -56,11 +57,17 @@ class Perlin2DField(Field):
         random.seed(seed)
         noise = generate_perlin_noise_2d(shape, res)
         # [-1, 1] -> [-pi, pi]
-        field = noise * pi
+        field = noise * 2 * pi
         super().__init__(field)
 
         self.shape = shape
         self.res = res
+
+    # def as_img_data(self):
+    # for n in self.field.flatten():
+    # g = (n + 1) * 0.5
+    # TODO: make image cache
+    # Sampler.cached = (width, height, depth, memoryview(np.array(out)))
 
 
 class Perlin3DField(Field):
@@ -72,15 +79,8 @@ class Perlin3DField(Field):
         Note: shape must be a multiple of res
         """
         random.seed(seed)
-        noise = generate_perlin_noise_3d(shape, res)
-        # [-1, 1] -> [-pi, pi]
-        field = noise * pi
+        field = generate_perlin_noise_3d(shape, res)
         super().__init__(field)
 
         self.shape = shape
         self.res = res
-
-
-field = Perlin3DField((12, 12, 12), (2, 2, 2))
-fn = field.fn(((-1, 1), (-1, 1), (-1, 1)))
-fn(0, 0, 0)

@@ -34,16 +34,26 @@ class Sketch:
         self.option_d = False
 
         # colors: rgba
-        self.color_a = [0, 0, 0, 0]
-        self.color_b = [0, 0, 0, 0]
-        self.color_c = [0, 0, 0, 0]
-        self.color_d = [0, 0, 0, 0]
+        self.color_a = [1, 1, 1, 1]
+        self.color_b = [1, 0, 1, 1]
+        self.color_c = [1, 1, 0, 1]
+        self.color_d = [0, 1, 1, 1]
 
         # random seed: Int
         # TODO: import from AE
         self.random_seed = 0
 
         # TODO: AE can pass in points
+
+    def randomize_params(self):
+        import random
+
+        self.param_a = random.uniform(0, 1)
+        self.param_b = random.uniform(0, 1)
+        self.param_c = random.uniform(0, 1)
+        self.param_d = random.uniform(0, 1)
+
+        print("Params:", self.param_a, self.param_b, self.param_c, self.param_d)
 
     def set_layer_in_data(self, memview, stride):
         """
@@ -167,13 +177,13 @@ class Sketch:
         # convert to grayscale luminosity
         return (samp[0:3] * array([0.21, 0.72, 0.07])).sum()
 
-    def vector_at(self, xy):
+    def vector_at(self, xy, mult=2):
         """
         Samples incoming layer data and converts to vector
         """
         samp = self.sample_layer_in(xy)
         # convert to grayscale luminosity
-        val = 2 * pi * (samp[0:3] * array([0.21, 0.72, 0.07])).sum()
+        val = mult * pi * (samp[0:3] * array([0.21, 0.72, 0.07])).sum()
         # use val as angle for vector
         return array((sin(val), cos(val)))
 

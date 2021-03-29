@@ -3,7 +3,12 @@ from numpy import linspace
 
 
 class Grid:
-    def __init__(self, w, h, rows, cols, padding=0):
+    def __init__(self, x, y, w, h, rows, cols, padding=0):
+        """
+        (x, y) is top left of grid (origin)
+        """
+        self._x = x
+        self._y = y
         self._w = w
         self._h = h
         self._rows = rows

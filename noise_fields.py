@@ -1,10 +1,10 @@
 #%%
 from lib.sketch import Sketch
-from lib.interp import remap, lerp
-from lib.field import Perlin3DField
-from numpy import array
+from lib.interp import lerp
+from geom.grid import Grid
+from numpy import array, empty
 from numpy import linspace
-from numpy import sin, cos
+from numpy import sin, cos, pi
 
 
 class NoiseField(Sketch):
@@ -15,93 +15,79 @@ class NoiseField(Sketch):
 
     def __init__(self, w, h):
         clear_color = [0, 0, 0, 1]
-        range = [-1, 1]
+        range = [0, 1]
         super().__init__(w, h, clear_color, range)
-        self.setup_field()
-
-    def setup_field(self):
-        # setup perlin field sampling function
-        # TODO:
-        # - types of noise
-        # - noise settings
-        shape = (12, 12, 12)
-        res = (3, 3, 3)
-        self.field = Perlin3DField(shape, res)
-        self.dims = [(-1.2, 1.2), (-1.2, 1.2), (-1.2, 1.2)]
-        self.fn = self.field.fn(self.dims)
 
     def draw(self):
-        z = remap(0, 1, -1, 1, self.step)
-        # print("step - z", z)
+        steps = int(lerp(1, 256, self.step))
+        x_density = int(lerp(self.w / 64, self.w / 4, self.param_a))
+        y_density = int(lerp(self.h / 64, self.h / 4, self.param_a))
+        padding = lerp(0, 0.75, self.param_b)
+        line_width = lerp(0.1, 3.0, self.param_c)
+        conv = lerp(1.0, 8.0, self.param_d)
 
-        def marker(x, y, theta, base=False):
-            a = array((x, y))
-            b = a + (sin(theta) * 0.04, cos(theta) * 0.04)
-            if base:
-                self.circle(a, 0.01)
-            self.line(a, b)
+        # set wanderer starting positions
+        grid = Grid(0, 0, 1, 1, 1, x_density, padding=padding)
+        starts = grid.centers()
 
-        # DEBUG: underlying field points (not interpolated)
-        self.set_line_width(1)
-        self.set_color(self.color_b)
-        d0, d1, _ = self.dims
-        r0, r1, r2 = self.field.shape
-        k = round(self.step * (r2 - 1))
-        # print("k", k)
-        j = 0
-        for y in linspace(d1[0], d1[1], r1):
-            i = 0
-            for x in linspace(d0[0], d0[1], r0):
-                theta = self.field.field[i, j, k]
-                marker(x, y, theta, base=True)
-                i += 1
-            j += 1
+        # wander points through field
+        speed = 0.01
+        paths = []
+        for start in starts:
+            path = empty([steps, 2])
+            path[0] = start
+            for i in range(1, steps):
+                # last position
+                x, y = path[i - 1]
+                vec = self.vector_at((x, y), mult=conv)
+                # new position
+                nx = x + vec[0] * speed
+                ny = y + vec[1] * speed
+                path[i] = [nx, ny]
+            paths.append(path)
 
         # DEBUG: display flow field (interpolated points)
-        self.set_line_width(1.0)
+        if self.option_d:
+            self.set_color(self.color_d)
+            rad = (self.max_x - self.min_x) / x_density / 3
+            for y in linspace(self.min_y, self.max_y, x_density):
+                for x in linspace(self.min_x, self.max_x, y_density):
+                    vec = self.vector_at((x, y))
+                    a = array((x, y))
+                    b = a + vec * 0.1
+                    self.set_color(self.sample_layer_in((x, y)))
+                    self.circle(a, rad, fill=True)
+
+            self.set_line_width(60 / x_density)
+            self.set_color([1, 1, 1, 1])
+            for y in linspace(self.min_y, self.max_y, x_density):
+                for x in linspace(self.min_x, self.max_x, y_density):
+                    vec = self.vector_at((x, y))
+                    a = array((x, y))
+                    b = a + vec * 0.1
+                    self.line(a, b)
+
+        # draw wandering paths
         self.set_color(self.color_a)
-        display_density = r0 * 4
-        for y in linspace(self.min_y, self.max_y, display_density):
-            for x in linspace(self.min_x, self.max_x, display_density):
-                theta = self.fn(x, y, z)
-                marker(x, y, theta)
+        self.set_line_width(line_width)
+        for path in paths:
+            self.path(path)
 
 
 """
+# load sample image (once, static)
+from helpers.img_samp import Sampler
 
-width, height = 900, 900
+width, height, depth, view = Sampler("helpers/perlin-noise.png").load_image()
 sketch = NoiseField(width, height)
+sketch.set_layer_in_data(view, width * depth)
 
-step = 0
-sketch.set_step(step)
-
-# sketch.set_params(count, smoothness, amp, weight)
-# ARGB
-sketch.set_colors(
-    [0xFF, 0xFF, 0xFF, 0xFF],
-    [0xFF, 0xFF, 0x00, 0xFF],
-    [0xFF, 0xFF, 0x00, 0x00],
-    [0xFF, 0xFF, 0x00, 0x00],
-)
-
-# drop point on field and let it wander
-# steps = 0
-# speed = 0.025
-# path = empty([steps, 2])
-# path[0] = [0, 0]
-# for i in range(1, steps):
-# last position
-# x, y = path[i - 1]
-# theta = sketch.f(x, y)
-# new position
-# nx = x + sin(theta) * speed
-# ny = y + cos(theta) * speed
-# path[i] = [nx, ny]
+sketch.set_step(0.3)
+# density, padding, line width, ???
+sketch.set_params(0.2, 0.3, 0.1, 0.0)
+sketch.set_options(False, False, False, False)
 
 sketch.render()
-# sketch.set_color([0, 1, 1, 1])
-# sketch.path(path)
-
 %load_ext helpers.ipython_cairo
 sketch.ctx
 """
