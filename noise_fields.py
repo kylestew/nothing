@@ -1,4 +1,5 @@
 #%%
+from cairo import LINE_CAP_ROUND
 from lib.sketch import Sketch
 from lib.interp import lerp
 from geom.grid import Grid
@@ -19,19 +20,19 @@ class NoiseField(Sketch):
         super().__init__(w, h, clear_color, range)
 
     def draw(self):
-        steps = int(lerp(1, 256, self.step))
-        x_density = int(lerp(self.w / 64, self.w / 4, self.param_a))
-        y_density = int(lerp(self.h / 64, self.h / 4, self.param_a))
+        steps = int(lerp(1, 1024, self.step))
+        x_density = int(lerp(self.w / 256, self.w / 4, self.param_a))
+        y_density = int(lerp(self.h / 256, self.h / 4, self.param_a))
         padding = lerp(0, 0.75, self.param_b)
-        line_width = lerp(0.1, 3.0, self.param_c)
+        line_width = lerp(0.1, 8.0, self.param_c)
         conv = lerp(1.0, 8.0, self.param_d)
 
         # set wanderer starting positions
-        grid = Grid(0, 0, 1, 1, 1, x_density, padding=padding)
+        grid = Grid(0, 0, 1, 1, 12, 12, padding=padding)
         starts = grid.centers()
 
         # wander points through field
-        speed = 0.01
+        speed = 0.0005
         paths = []
         for start in starts:
             path = empty([steps, 2])
@@ -69,6 +70,7 @@ class NoiseField(Sketch):
 
         # draw wandering paths
         self.set_color(self.color_a)
+        self.ctx.set_line_cap(LINE_CAP_ROUND)
         self.set_line_width(line_width)
         for path in paths:
             self.path(path)
