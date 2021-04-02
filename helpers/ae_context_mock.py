@@ -6,8 +6,37 @@ def _setup(w, h):
     global _w, _h, _sur, _ctx
     _w = w
     _h = h
+    _one = 1.0
     _sur = cairo.ImageSurface(cairo.FORMAT_ARGB32, _w, _h)
     _ctx = cairo.Context(_sur)
+
+
+def set_range(r0, r1):
+    global _min_x, _max_x, _min_y, _max_y, _one
+
+    small_side = 0
+    xoff = 0
+    yoff = 0
+    if _w > _h:
+        small_side = _h
+        xoff = (_w - _h) / 2
+    else:
+        small_side = _w
+        yoff = (_h - _w) / 2
+
+    xscale = small_side / (r1 - r0)
+    yscale = small_side / (r1 - r0)
+
+    _ctx.translate(xoff, -yoff)
+    _ctx.scale(xscale, -yscale)
+    _ctx.translate(-r0, -r1)
+
+    _min_x = ((0 - xoff) / xscale) + r0
+    _max_x = ((_w - xoff) / xscale) + r0
+    _min_y = ((0 - yoff) / yscale) + r0
+    _max_y = ((_h - yoff) / yscale) + r0
+
+    _one = 1.0 / xscale
 
 
 def clear(c):
@@ -33,7 +62,7 @@ def set_operator(op):
 
 
 def set_line_width(width):
-    _ctx.set_line_width(width)
+    _ctx.set_line_width(_one * width)
 
 
 def set_line_cap(opt):
@@ -41,9 +70,9 @@ def set_line_cap(opt):
     _ctx.set_line_cap(opt)
 
 
-def line(a, b):
-    _ctx.move_to(a[0], a[1])
-    _ctx.line_to(b[0], b[1])
+def line(x0, y0, x1, y1):
+    _ctx.move_to(x0, y0)
+    _ctx.line_to(x1, y1)
     _ctx.stroke()
 
 
@@ -70,6 +99,9 @@ def path(xy, closed=False, fill=False):
     _ctx.move_to(*xys[0, :])
     for p in xys:
         _ctx.line_to(*p)
+
+    if closed:
+        _ctx.close_path()
     if fill:
         _ctx.fill()
     else:

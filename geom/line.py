@@ -11,6 +11,14 @@ class Line(PCLike):
         # TODO: does this become a polyline?
         return array(resample(self.vertices(), dist, num, closed=False))
 
+    def point_at(self, t):
+        p0, p1 = self.points
+        x0, y0 = p0
+        x1, y1 = p1
+        x = x0 + (x1 - x0) * t
+        y = y0 + (y1 - y0) * t
+        return (x, y)
+
     def vertices(self):
         return self.points
 

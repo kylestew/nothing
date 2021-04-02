@@ -1,9 +1,10 @@
-from numpy import column_stack
+from numpy import column_stack, array
 from numpy import linspace
 from numpy import sin, cos
 from numpy import pi
 from geom.api.shape import PCLike
 from .internal.resample import resample
+from .line import Line
 
 
 class Polygon(PCLike):
@@ -22,6 +23,16 @@ class Polygon(PCLike):
 
     def resample(self, dist=None, num=None):
         return Polygon(resample(self.points, dist, num))
+
+    def edges(self):
+        lines = []
+        for i0, pt in enumerate(self.points):
+            i1 = i0 + 1
+            if i1 >= len(self.points):
+                i1 = 0
+            p1 = self.points[i1]
+            lines.append(Line(pt, p1))
+        return array(lines)
 
     def vertices(self):
         return self.points

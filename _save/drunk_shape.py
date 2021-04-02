@@ -1,69 +1,127 @@
+"""
 #%%
-# perlin noise -> vector flow field
-from perlin import generate_perlin_noise_2d
-from numpy import array
+# LOAD sample image
+import matplotlib.image as mpimg
+
+img = mpimg.imread("helpers/grad.png")
+img = (img * 255).astype(int)
+height, width, depth = img.shape
+img = img.reshape(width * height, depth)
+out = []
+for row in img:
+    # rgba -> argb
+    out.append(row[3])
+    out.append(row[0])
+    out.append(row[1])
+    out.append(row[2])
+
 import numpy as np
-np.random.seed(5)
-noise_density = 1024
-noise = generate_perlin_noise_2d((noise_density, noise_density), (8, 8))
-theta = noise * 2 * np.pi
-xs = np.sin(theta)
-ys = np.cos(theta)
-flow_field = np.column_stack((xs.flatten(), ys.flatten())).reshape(noise_density, noise_density, 2)
-flow_field.shape
-flow_field[0][1]
 
-iterations = 512
-mult = 0.001
+view = memoryview(np.array(out))
+print(len(view))
+"""
 
+
+#%%
+from lib.sketch import Sketch
+from numpy import array
+from lib.interp import lerp
 from geom.rect import Rect
-rect = Rect(0.3, 0.3, 0.4, 0.4)
-poly = rect.resample(dist=0.0005)
-paths = [ poly.points ]
-for i in range(iterations):
-    xy = (poly.points * noise_density).astype(int)
-    samps = []
-    for x, y in xy:
-        if x < 0:
-            x += noise_density
-        if x >= noise_density:
-            x -= noise_density
-        if y < 0:
-            y += noise_density
-        if y >= noise_density:
-            y -= noise_density
-        samps.append(flow_field[x][y])
-    poly.points += array(samps) * mult
-    paths.append(poly.points.copy())
+from geom.circle import Circle
 
-    
+
+class Sandbox(Sketch):
+    def __init__(self, w, h):
+        clear_color = [0, 0, 0, 1]
+        # range = [-1, 1]
+        range = None  # TODO: normalize canvas!
+        super().__init__(w, h, clear_color, range)
+
+    def walk_drunkly(self, pts, iterations, speed):
+        paths = []
+        for i in range(iterations):
+            xy = pts.astype(int)
+            samps = []
+            for x, y in xy:
+                if x < 0:
+                    x += self.w
+                if x >= self.w:
+                    x -= self.w
+                if y < 0:
+                    y += self.h
+                if y >= self.h:
+                    y -= self.h
+                samps.append(self.vector_at((x, y)))
+            pts += array(samps) * speed
+            paths.append(pts.copy())
+        return paths
+
+    def draw(self):
+        # prepare params
+        step = self.step
+
+        size = self.h * self.param_a
+        thickness = lerp(0.5, 4.0, self.param_b)
+        resamp_count = int(lerp(4, 400, self.param_c))
+        speed = lerp(0.1, 10, self.param_d)
+
+        # create base shape
+        circ = Circle(self.w / 2, self.h / 2, size / 2)
+
+        # calculate drunk walk
+        poly = circ.as_polygon(n=resamp_count)
+        paths = self.walk_drunkly(poly.points, step, speed)
+
+        # (opt) render base shape
+        if self.option_a:
+            self.set_color(self.color_a)
+            self.set_line_width(thickness * 4.0)
+            self.path(circ.vertices(64), closed=True)
+
+        # (opt) draw connectors
+        if self.option_b:
+            self.set_color(self.color_b)
+            self.set_line_width(thickness)
+            for path in paths:
+                self.path(path, closed=True)
+
+        # (opt) draw walkers
+        if self.option_c:
+            self.set_color(self.color_c)
+            for path in paths:
+                for pt in path:
+                    self.circle(pt, 2.0 * thickness, fill=True)
+
+
+"""
 %load_ext helpers.ipython_cairo
-from modules.render import Render
-from modules.color import hex_to_rgba
+sketch = Sandbox(width, height)
+sketch.set_layer_in_data(view, width * depth)
 
-from numpy import array, pi, cos, sin, column_stack
+step = 500
+sketch.set_step(step)
 
-CANVAS_SQUARE_SIZE = noise_density * 2
-BACKGROUND = hex_to_rgba("#332633")
-FOREGROUND = hex_to_rgba("#ee99aa12")
-DEBUG = hex_to_rgba("#00FFFF24")
+shape_size = 0.2
+thickness = 0.05
+complexity = 0.2
+speed = 0.05
+sketch.set_params(shape_size, thickness, complexity, speed)
 
-render = Render(CANVAS_SQUARE_SIZE, BACKGROUND, FOREGROUND)
-# render.remap(domain=(-0.05, 1.05), range=(-0.05, 1.05))
+shape = True
+connectors = False
+walkers = True
+sketch.set_options(shape, connectors, walkers, False)
 
-render.set_line_width(9.0)
-render.set_front(hex_to_rgba("FFFFFFee"))
-render.path(rect.vertices(), closed=True)
+sketch.set_colors(
+    # shape
+    [0xFF, 0xFF, 0xFF, 0xFF],
+    # connectors
+    [0x04, 0xFF, 0x00, 0xFF],
+    # walkers
+    [0xFF, 0xFF, 0x00, 0x00],
+    [0xFF, 0xFF, 0x00, 0x00],
+    )
 
-render.set_line_width(2.0)
-
-for path in paths:
-    render.set_front(FOREGROUND)
-    render.path(path, closed=True)
-
-for path in paths:
-    for pt in path:
-        render.set_front(DEBUG)
-        render.circle(pt, 0.0001)
-
-render.ctx
+d = sketch.render()
+sketch.ctx
+"""
