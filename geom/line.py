@@ -19,8 +19,19 @@ class Line(PCLike):
         y = y0 + (y1 - y0) * t
         return (x, y)
 
+    def split_at(self, t):
+        p0, p1 = self.points
+        p = self.point_at(t)
+        return [Line(p0, p), Line(p, p1)]
+
     def vertices(self):
         return self.points
+
+    def draw(self, ctx):
+        p0, p1 = self.points
+        x0, y0 = p0
+        x1, y1 = p1
+        ctx.line(x0, y0, x1, y1)
 
 
 """
