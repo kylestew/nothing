@@ -68,6 +68,7 @@ def set_line_width(width):
 def set_line_cap(opt):
     # TODO: may need to convert int to symbol
     _ctx.set_line_cap(opt)
+    _ctx.set_line_join(opt)
 
 
 def line(x0, y0, x1, y1):

@@ -1,28 +1,52 @@
 from geom.api.shape import PCLike
 from .internal.resample import resample
 from numpy import array
+from numpy.linalg import norm
 
 
 class Line(PCLike):
     def __init__(self, a, b):
         super().__init__([a, b])
 
+    # vector, position, and length to create line
+    @classmethod
+    def from_vector(cls, v, origin):
+        a = origin
+        b = origin + v
+        return cls(a, b)
+
     def resample(self, dist=None, num=None):
         # TODO: does this become a polyline?
         return array(resample(self.vertices(), dist, num, closed=False))
 
-    def point_at(self, t):
+    def _xys(self):
         p0, p1 = self.points
         x0, y0 = p0
         x1, y1 = p1
+        return (x0, y0, x1, y1)
+
+    def point_at(self, t):
+        x0, y0, x1, y1 = self._xys()
         x = x0 + (x1 - x0) * t
         y = y0 + (y1 - y0) * t
-        return (x, y)
+        return array((x, y))
 
     def split_at(self, t):
         p0, p1 = self.points
         p = self.point_at(t)
         return [Line(p0, p), Line(p, p1)]
+
+    def length(self):
+        return norm(self.points)
+
+    def as_vector(self):
+        x0, y0, x1, y1 = self._xys()
+        i = x1 - x0
+        j = y1 - y0
+        return array((i, j))
+
+    def unit_vector(self):
+        return self.as_vector() / self.length()
 
     def vertices(self):
         return self.points
