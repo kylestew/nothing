@@ -42,3 +42,7 @@ class Rect:
         p = (self.x, self.y)
         q = (p[0] + self.w, p[1] + self.h)
         return array([p, (q[0], p[1]), q, (p[0], q[1])])
+
+    # === Cairo ===
+    def draw(self, ctx, fill=False):
+        ctx.rect(self.x, self.y, self.w, self.h, fill=fill)

@@ -1,9 +1,7 @@
-from numpy import column_stack, array
-from numpy import linspace
-from numpy import sin, cos
-from numpy import pi
+from numpy import array
 from geom.api.shape import PCLike
 from .internal.resample import resample
+from .internal.transform import translate_points, rotate_points, scale_points
 from .line import Line
 
 
@@ -11,18 +9,28 @@ class Polygon(PCLike):
     def __init__(self, pts):
         super().__init__(pts)
 
-    # regular polygon of n-sides
-    @classmethod
-    def ngon(cls, n, x=0, y=0, r=1):
-        a = linspace(0, pi * 2, n, endpoint=False)
-        pts = (x, y) + column_stack((cos(a), sin(a))) * r
-        return cls(pts)
-
-    def center(self):
+    # === Ops ===
+    def area(self):
         pass
 
-    def resample(self, dist=None, num=None):
-        return Polygon(resample(self.points, dist, num))
+    def as_polygon(self, n=None):
+        return Polygon(self.vertices(n))
+
+    def bounds(self):
+        pass
+
+    def center(self):
+        pts = self.points
+        area = 0
+        xy = array([0.0, 0.0])
+        a = pts[-1]
+        for idx, pt in enumerate(pts):
+            a = pts[idx - 1]
+            z = a[0] * pt[1] - a[1] * pt[0]
+            area += z
+            xy += a + pt * z
+        area = 1 / (area * 3)
+        return xy * area
 
     def edges(self):
         lines = []
@@ -34,5 +42,27 @@ class Polygon(PCLike):
             lines.append(Line(pt, p1))
         return array(lines)
 
-    def vertices(self):
+    def resample(self, dist=None, num=None):
+        return Polygon(resample(self.points, dist, num))
+
+    # def tessellate(self, ?):
+
+    def translate(self, tx, ty):
+        return Polygon(translate_points(self.vertices(), tx, ty))
+
+    def rotate(self, rad):
+        return Polygon(rotate_points(self.vertices(), rad))
+
+    def scale(self, sx, sy):
+        return Polygon(scale_points(self.vertices(), sx, sy))
+
+    def vertices(self, n=None):
+        if n == None:
+            return self.points
+
+        # TODO: implement resampling
         return self.points
+
+    # === Cairo ===
+    def draw(self, ctx, fill=False):
+        ctx.path(self.points.tolist(), closed=True, fill=fill)

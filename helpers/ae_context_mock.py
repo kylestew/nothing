@@ -50,7 +50,10 @@ def get_canvas_size():
 
 
 def sample_point(x, y):
-    pass
+    # TODO: actual image sampling
+    from numpy.random import rand
+
+    return rand(4)
 
 
 def set_color(c):
@@ -100,6 +103,17 @@ def path(xy, closed=False, fill=False):
     _ctx.move_to(*xys[0, :])
     for p in xys:
         _ctx.line_to(*p)
+
+    if closed:
+        _ctx.close_path()
+    if fill:
+        _ctx.fill()
+    else:
+        _ctx.stroke()
+
+
+def arc(cx, cy, r, start, end, fill=False, closed=False):
+    _ctx.arc(cx, cy, r, start, end)
 
     if closed:
         _ctx.close_path()

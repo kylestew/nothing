@@ -14,7 +14,7 @@ step = 0.4
 param_a = 0.20
 
 # strut length
-param_b = 0.0
+param_b = 0.2
 
 # strut noise effect
 # (samples incoming noise)
@@ -25,7 +25,7 @@ param_d = 0.75
 
 # strut pct noise effect
 # (samples incoming noise)
-param_e = 0.5
+param_e = 0
 
 # line thickness
 param_f = 0.2
@@ -74,6 +74,14 @@ def penguin(penta, n):
     # find midpoints on edges
     edges = penta.edges()
     count = len(edges)
+
+    # pcts = edges.points
+    print("sample:", ctx.sample_point(0, 0))
+    
+    TODO: sample randomness from incodming canvas
+
+        # return (samp[0:3] * array([0.21, 0.72, 0.07])).sum()
+
     pcts = rand(count) * param_e * strut_pct
     midpoints = list(map(lambda e: e[0].point_at(e[1]), zip(edges, pcts)))
     lengths = rand(count) * strut_length

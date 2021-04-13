@@ -1,5 +1,6 @@
 from shapely.geometry import Polygon as SPolygon
 from shapely import affinity
+from numpy import array
 
 
 def translate_points(pts, xoff, yoff):
@@ -9,9 +10,11 @@ def translate_points(pts, xoff, yoff):
 
 
 def rotate_points(pts, rad):
+    print("incoming points", pts)
     poly = SPolygon(pts)
-    poly = affinity.rotate(poly, rad, use_radians=True)
-    return list(poly.exterior.coords)
+    poly = affinity.rotate(poly, rad, origin="centroid", use_radians=True)
+    pts = array(list(poly.exterior.coords))
+    return pts[:-1]
 
 
 def scale_points(pts, xscale, yscale):
