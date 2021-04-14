@@ -19,14 +19,14 @@ class Arc:
         # distance between two points
         x1, y1 = a
         x2, y2 = b
-        print("a", x1, y1)
-        print("b", x2, y2)
+        # print("a", x1, y1)
+        # print("b", x2, y2)
         dist = sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-        print("dist", dist)
+        # print("dist", dist)
         # halfway point
         xAvg = (x1 + x2) / 2.0
         yAvg = (y1 + y2) / 2.0
-        print("mid", xAvg, yAvg)
+        # print("mid", xAvg, yAvg)
         # circle center
         cx = sqrt(r * r - dist * dist / 4.0) * (y1 - y2) / dist
         cy = sqrt(r * r - dist * dist / 4.0) * (x2 - x1) / dist
@@ -34,11 +34,11 @@ class Arc:
         # cy = yAvg + (cy if clockwise else -cy)
         cx = xAvg + cx
         cy = yAvg + cy
-        print("center", cx, cy)
+        # print("center", cx, cy)
         # angles (cairo's arc and python's ATAN2 aren't friends)
         angle1 = -atan2(x1 - cx, y1 - cy) + pi / 2
         angle2 = -atan2(x2 - cx, y2 - cy) + pi / 2
-        print("constr arct", cx, cy, r, angle1, angle2)
+        # print("constr arct", cx, cy, r, angle1, angle2)
         return cls(cx=cx, cy=cy, r=r, start=angle1, end=angle2, clockwise=clockwise)
 
     def point_at_theta(self, theta):

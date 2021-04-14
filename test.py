@@ -3,9 +3,10 @@ print("step:", step)
 print("params:", param_a, param_b, param_c, param_d)
 print("options:", option_a, option_b, option_c, option_d)
 print("colors:", color_a, color_b, color_c, color_d)
-print("points:", point_a, point_b)
 print("sample:", ctx.sample_point(0, 0))
 """
+
+print("points:", point_b)
 
 w, h = ctx.get_canvas_size()
 print("canvas size", w, h)

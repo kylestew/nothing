@@ -10,7 +10,6 @@ def translate_points(pts, xoff, yoff):
 
 
 def rotate_points(pts, rad):
-    print("incoming points", pts)
     poly = SPolygon(pts)
     poly = affinity.rotate(poly, rad, origin="centroid", use_radians=True)
     pts = array(list(poly.exterior.coords))

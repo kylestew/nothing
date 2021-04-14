@@ -17,8 +17,8 @@ class Grid:
         # store the grid cells as rects
         cw = (w - padding * (cols + 1)) / cols
         ch = (h - padding * (rows + 1)) / rows
-        xs = linspace(0 + padding, w, cols, endpoint=False)
-        ys = linspace(0 + padding, h, rows, endpoint=False)
+        xs = linspace(0 + padding + x, w + x, cols, endpoint=False)
+        ys = linspace(0 + padding + y, h + y, rows, endpoint=False)
 
         rects = []
         for y in ys:
