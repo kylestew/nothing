@@ -88,6 +88,12 @@ def rect(x, y, w, h, fill=False):
         _ctx.stroke()
 
 
+def point(x, y, px=1):
+    r = _one * px
+    _ctx.arc(x, y, r, 0, 2 * pi)
+    _ctx.fill()
+
+
 def circle(x, y, r, fill=False):
     _ctx.arc(x, y, r, 0, 2 * pi)
     if fill:
