@@ -14,6 +14,7 @@ class Field:
         """
         Creates an interpolation function on the field (treated as a regular grid in 2 or 3 dimensions)
         The grid is defined by the _dims_ parameter and effectively remaps the field
+        dims - ([x_min, x_max], [y_min, y_max])
         """
         n = len(dims)
         if n == 2:
