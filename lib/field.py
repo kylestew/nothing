@@ -58,17 +58,12 @@ class Perlin2DField(Field):
         random.seed(seed)
         noise = generate_perlin_noise_2d(shape, res)
         # [-1, 1] -> [-pi, pi]
-        field = noise * 2 * pi
+        # field = noise * 2 * pi
+        field = noise
         super().__init__(field)
 
         self.shape = shape
         self.res = res
-
-    # def as_img_data(self):
-    # for n in self.field.flatten():
-    # g = (n + 1) * 0.5
-    # TODO: make image cache
-    # Sampler.cached = (width, height, depth, memoryview(np.array(out)))
 
 
 class Perlin3DField(Field):
