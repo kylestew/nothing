@@ -15,6 +15,14 @@ class Line(PCLike):
         b = origin + v
         return cls(a, b)
 
+    # === Ops ===
+    # area - ? (line has no area)
+    # as_polygon - ?
+    # bounds - ? (line has no bounds)
+
+    def center(self):
+        return self.point_at(0.5)
+
     def resample(self, dist=None, num=None):
         # TODO: does this become a polyline?
         return array(resample(self.vertices(), dist, num, closed=False))
@@ -35,6 +43,20 @@ class Line(PCLike):
         p0, p1 = self.points
         p = self.point_at(t)
         return [Line(p0, p), Line(p, p1)]
+
+    def shatter(self, ts):
+        """
+        split line at multiple t points [0, 1]
+        method is going to behave weird if ts aren't in range [0, 1]
+        """
+        p_start, p_last = self.points
+        segments = []
+        for t in ts:
+            p_end = self.point_at(t)
+            segments.append(Line(p_start, p_end))
+            p_start = p_end
+        segments.append(Line(p_start, p_last))
+        return segments
 
     def length(self):
         return norm(self.points)

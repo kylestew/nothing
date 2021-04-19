@@ -69,7 +69,7 @@ class Perlin2DField(Field):
 class Perlin3DField(Field):
     def __init__(self, shape, res, seed=0):
         """
-        + shape: shape of the generated array (tuple of 23ints)
+        + shape: shape of the generated array (tuple of 3 ints)
         + res: number of periods of noise to generate along each axis (tuple of 3 ints)
         + seed: rng seed (numpy)
         Note: shape must be a multiple of res
