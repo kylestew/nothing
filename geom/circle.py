@@ -7,9 +7,10 @@ from .api.samples import DEFAULT_SAMPLES
 
 
 class Circle:
-    def __init__(self, x=0, y=0, r=1):
+    def __init__(self, x=0, y=0, r=1, theta=0):
         self.origin = array((x, y))
         self.r = r
+        self.theta = theta
 
     # === Ops ===
     def area(self):
@@ -36,14 +37,17 @@ class Circle:
         pass
 
     def rotate(self, rad):
-        # how do you rotate a circle?
-        pass
+        (
+            x,
+            y,
+        ) = self.origin
+        return Circle(x, y, self.r, self.theta + rad)
 
     def scale(self, sx, sy):
         pass
 
     def vertices(self, n=DEFAULT_SAMPLES):
-        a = linspace(0, pi * 2, n + 1)
+        a = linspace(0, pi * 2, n + 1) + self.theta
         circ = self.origin + column_stack((cos(a), sin(a))) * self.r
         return circ[:-1]
 

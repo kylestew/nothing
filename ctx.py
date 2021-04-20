@@ -1,6 +1,8 @@
 import cairo
 from numpy import pi
 
+print("***USING PROTOTYPE CONTEXT***")
+
 
 def _setup(w, h):
     global _w, _h, _sur, _ctx
@@ -127,6 +129,3 @@ def arc(cx, cy, r, start, end, fill=False, closed=False):
         _ctx.fill()
     else:
         _ctx.stroke()
-
-
-_setup(256, 256)
