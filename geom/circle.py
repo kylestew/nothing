@@ -54,4 +54,4 @@ class Circle:
     # === Cairo ===
     def draw(self, ctx, fill=False):
         x, y = self.origin
-        ctx.circle(x, y, self.r)
+        ctx.circle(x, y, self.r, fill=fill)

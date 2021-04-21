@@ -29,14 +29,15 @@ class OptionParam(Param):
         super().__init__(PARAM_OPTION, name)
 
 
-# return [
-# "step": FloatParam()
-# ["Step", "step", "float", 0.0, 1.0, 0.5],
-# ["Option A", "option_a", "bool", 0.0, 1.0, False],
-# ["Color A", "color_a", "color", 0.0, 1.0, [1, 0, 0, 1]],
-# ["Point A", "point_a", "point", 0.0, 1.0, [0.5, 0.5]],
-# ]
+class ColorParam(Param):
+    def __init__(self, name, default=[1, 0, 0, 1]):
+        self.default = default
+        self.value = default
+        super().__init__(PARAM_COLOR, name)
 
-# AE interogates params to bind UI
-# on render, AE invokes params array and updates all values in array instead of polluting var space
-# can make a function that updates param value
+
+class PointParam(Param):
+    def __init__(self, name, default=[0, 0]):
+        self.default = default
+        self.value = default
+        super().__init__(PARAM_POINT, name)
