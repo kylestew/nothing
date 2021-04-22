@@ -17,14 +17,14 @@ class Sampler:
         img = mpimg.imread(self.filename)
         img = (img * 255).astype(int)
         height, width, depth = img.shape
-        img = img.reshape(width * height, depth)
-        out = []
-        for row in img:
-            # rgba -> argb
-            out.append(row[3])
-            out.append(row[0])
-            out.append(row[1])
-            out.append(row[2])
+        # img = img.reshape(width * height, depth)
+        # out = []
+        # for row in img:
+        # out.append(row[0])
+        # out.append(row[1])
+        # out.append(row[2])
+        # out.append(row[3])
 
-        Sampler.cached = (width, height, depth, memoryview(np.array(out)))
+        Sampler.cached = (width, height, depth, img)
+        # Sampler.cached = (width, height, depth, memoryview(np.array(out)))
         return Sampler.cached

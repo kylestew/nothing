@@ -1,5 +1,6 @@
 import cairo
 from numpy import pi
+from helpers.img_samp import Sampler
 
 print("***USING PROTOTYPE CONTEXT***")
 
@@ -51,11 +52,25 @@ def get_canvas_size():
     return (_w, _h)
 
 
-def sample_point(x, y):
-    # TODO: actual image sampling
-    from numpy.random import rand
+def _prep_sampler(filename):
+    import matplotlib.image as mpimg
+    from lib.field import Field
 
-    return rand(4)
+    global _sampler
+
+    img = mpimg.imread(filename)
+    height, width, depth = img.shape
+
+    field = Field(img)
+    _sampler = field.fn([[_min_x, _max_x], [_min_y, _max_y]])
+
+    return width, height
+
+
+def sample_point(x, y):
+    # map coords to img
+
+    return _sampler[y, x]
 
 
 def set_color(c):

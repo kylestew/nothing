@@ -1,3 +1,4 @@
+from perlin_numpy.perlin2d import generate_fractal_noise_2d
 from scipy import interpolate
 from numpy import linspace
 from numpy import pi
@@ -19,7 +20,8 @@ class Field:
         n = len(dims)
         if n == 2:
             d0, d1 = dims
-            r0, r1 = self.field.shape
+            r0 = self.field.shape[0]
+            r1 = self.field.shape[1]
             xs = linspace(d0[0], d0[1], r0)
             ys = linspace(d1[0], d1[1], r1)
             f = interpolate.interp2d(xs, ys, self.field, kind="cubic")
@@ -56,7 +58,27 @@ class Perlin2DField(Field):
         Note: shape must be a multiple of res
         """
         random.seed(seed)
-        noise = generate_perlin_noise_2d(shape, res)
+        noise = generate_perlin_noise_2d(shape, res, (True, True))
+        # [-1, 1] -> [-pi, pi]
+        # field = noise * 2 * pi
+        field = noise
+        super().__init__(field)
+
+        self.shape = shape
+        self.res = res
+
+
+class FractalNoise2DField(Field):
+    def __init__(self, shape, res, seed=0):
+        """
+        + shape: shape of the generated array (tuple of 2 ints)
+        + res: number of periods of noise to generate along each axis (tuple of 2 ints)
+        + seed: rng seed (numpy)
+        Note: shape must be a multiple of res
+        """
+        random.seed(seed)
+        noise = generate_fractal_noise_2d(shape, res, 5)
+        # , (True, True))
         # [-1, 1] -> [-pi, pi]
         # field = noise * 2 * pi
         field = noise
